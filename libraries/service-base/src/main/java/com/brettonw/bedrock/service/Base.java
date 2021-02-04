@@ -2,6 +2,7 @@ package com.brettonw.bedrock.service;
 
 import com.brettonw.bedrock.bag.*;
 import com.brettonw.bedrock.bag.formats.MimeType;
+import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,14 +14,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.io.input.ReversedLinesFileReader;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
@@ -340,7 +337,7 @@ public class Base extends HttpServlet {
                         var validationErrors = new BagArray ();
                         validateParameters (query, strict, parameterSpecification, validationErrors);
 
-                        // validate the post-data parameters (if any)
+                        // validate the post-data parameters
                         if ((parameterSpecification != null) && query.has (POST_DATA)) {
                             // check to see if there is a parameter specification for the post data
                             var postDataEventSpecification = parameterSpecification.getBagObject (POST_DATA);
@@ -445,7 +442,7 @@ public class Base extends HttpServlet {
         var nLines = event.getQuery().getInteger(LINE_COUNT, () -> 100);
         var result = new BagArray(nLines);
         var logFile = configuration.getString(LOG_FILE, () -> "/usr/local/tomcat/logs/catalina.out");
-        ReversedLinesFileReader reader = new ReversedLinesFileReader(new File(logFile), UTF_8);
+        var reader = new ReversedLinesFileReader(new File(logFile), UTF_8);
         for (int counter = 0; counter < nLines; ++counter) {
             var line = reader.readLine();
             if (line != null) {

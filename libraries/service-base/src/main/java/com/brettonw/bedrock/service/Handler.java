@@ -21,7 +21,7 @@ public class Handler {
 
         // construct the method name, and look it up in the container
         int dash;
-        String methodName = HANDLER_PREFIX + "-" + eventName;
+        var methodName = HANDLER_PREFIX + "-" + eventName;
         while ((dash = methodName.indexOf ('-')) >= 0) {
             int skip = dash + 1, end = skip + 1;
             methodName = methodName.substring (0, dash) + methodName.substring (skip, end).toUpperCase () + methodName.substring (end);
@@ -46,7 +46,7 @@ public class Handler {
             // compile withut it.
             // event.error (exception.toString ());
         } catch (InvocationTargetException exception) {
-            Throwable cause = exception.getCause ();
+            var cause = exception.getCause ();
             event.error (cause.toString ());
             log.error (method.getName () + " failed", cause);
         }

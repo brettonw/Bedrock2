@@ -121,22 +121,21 @@ public class TestServletContext implements ServletContext {
 
     @Override
     public String getRealPath (String s) {
-        String root = Paths.get (".").toAbsolutePath ().normalize ().toString ();
+        var root = Paths.get (".").toAbsolutePath ().normalize ().toString ();
 
         // the purpose of this library is to provide testing of live web servlets. They will be under
         // "src/main/webapp", but in some cases that location might not be part of the project, in
         // which case we want a reasonable fallback
 
         // first try to see if the requested reource is available in "src/main/webapp"
-        File webappFile = new File (new File (root, "src/main/webapp"), s);
+        var webappFile = new File (new File (root, "src/main/webapp"), s);
         if (webappFile.exists ()) {
             return webappFile.toString ();
         }
 
         // otherwise see if it's under "src/test" somewhere
-        File testFile = new File (root, "src/test");
-        String fullPath = new File (testFile, s).toString ();
-        return fullPath;
+        var testFile = new File (root, "src/test");
+        return new File (testFile, s).toString ();
     }
 
     @Override

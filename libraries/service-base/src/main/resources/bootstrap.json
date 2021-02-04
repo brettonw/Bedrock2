@@ -9,7 +9,7 @@
         "multiple": {
             "description": "Handle multiple events in array format.",
             "parameters": {
-                "post-data": { "description": "An array of other events", "required": true }
+                "events": { "description": "An array of other events", "required": true }
             }
         }
     }

@@ -20,7 +20,7 @@ public class TestResponse implements HttpServletResponse {
 
     @Override
     public PrintWriter getWriter () throws IOException {
-        PrintWriter printWriter = new PrintWriter (writerFile);
+        var printWriter = new PrintWriter (writerFile);
         return printWriter;
     }
 

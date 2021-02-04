@@ -46,7 +46,7 @@ public class TestRequest implements HttpServletRequest {
             postData = postDataBag.toString (mimeType);
             addHeader (CONTENT_TYPE_KEY, mimeType + ";charset=" + UTF_8);
             try {
-                byte[] bytes = postData.getBytes (UTF_8);
+                var bytes = postData.getBytes (UTF_8);
                 addHeader (CONTENT_LENGTH_KEY, Integer.toString (bytes.length));
             } catch (UnsupportedEncodingException exception) {
                 log.error (exception);

@@ -55,14 +55,12 @@ public class Tester extends HttpServlet {
     private void callFetchMethod (String name, HttpServletRequest request, HttpServletResponse response) {
         Method method = getFetchMethod (name);
         if (method != null) {
-            boolean accessible = method.isAccessible ();
             method.setAccessible (true);
             try {
                 method.invoke (httpServlet, request, response);
             } catch (IllegalAccessException | InvocationTargetException exception) {
                 log.error (exception);
             }
-            method.setAccessible (accessible);
         }
     }
 
@@ -71,9 +69,9 @@ public class Tester extends HttpServlet {
     }
 
     public File fileFromGet (String queryString) throws IOException {
-        File outputFile = new File (targetTestDir, java.util.UUID.randomUUID().toString ());
-        TestResponse response = new TestResponse (outputFile);
-        TestRequest request = new TestRequest (queryString);
+        var outputFile = new File (targetTestDir, java.util.UUID.randomUUID().toString ());
+        var response = new TestResponse (outputFile);
+        var request = new TestRequest (queryString);
         callFetchMethod ("doGet", request, response);
         return outputFile;
     }
@@ -83,15 +81,15 @@ public class Tester extends HttpServlet {
     }
 
     public File fileFromPost (String queryString, Bag postData) throws IOException {
-        File outputFile = new File (targetTestDir, java.util.UUID.randomUUID().toString ());
-        TestResponse response = new TestResponse (outputFile);
-        TestRequest request = new TestRequest (queryString, postData);
+        var outputFile = new File (targetTestDir, java.util.UUID.randomUUID().toString ());
+        var response = new TestResponse (outputFile);
+        var request = new TestRequest (queryString, postData);
         callFetchMethod ("doPost", request, response);
         return outputFile;
     }
 
     private BagObject bagObjectFromFile (File outputFile) {
-        BagObject bagObject = BagObjectFrom.file (outputFile);
+        var bagObject = BagObjectFrom.file (outputFile);
         outputFile.delete ();
         return bagObject;
     }
@@ -113,7 +111,7 @@ public class Tester extends HttpServlet {
     }
 
     private BagArray bagArrayFromFile (File outputFile) {
-        BagArray bagArray = BagArrayFrom.file (outputFile);
+        var bagArray = BagArrayFrom.file (outputFile);
         outputFile.delete ();
         return bagArray;
     }

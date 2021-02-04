@@ -15,7 +15,6 @@ public class EventFilter implements EventFilterHandler {
     Filter has:
     type (IP_ADDRESS_LIST, SECRET_LIST, AND_LIST, OR_LIST)
     event-list
-
      */
     public static final String FILTER_TYPE = "filter-type";
 
@@ -33,11 +32,11 @@ public class EventFilter implements EventFilterHandler {
     public static final String DENY = "deny";
 
     protected boolean checkEventList (Event event, BagObject filterConfiguration) {
-        BagArray eventList = filterConfiguration.getBagArray (EVENT_LIST);
+        var eventList = filterConfiguration.getBagArray (EVENT_LIST);
         if (eventList != null) {
-            String eventName = event.getEventName ();
+            var eventName = event.getEventName ();
             for (int i = 0, end = eventList.getCount (); i < end; ++i) {
-                String eventMatch = eventList.getString (i);
+                var eventMatch = eventList.getString (i);
                 if (eventMatch.equals (eventName) || eventMatch.equals (WILDCARD)) {
                     // the event matched, so this filter applies
                     return true;
@@ -52,18 +51,18 @@ public class EventFilter implements EventFilterHandler {
 
     protected EventFilterResult checkIpAddressList (Event event, BagArray ipAddressList) {
         if (ipAddressList != null) {
-            String eventIpAddress = event.getIpAddress();
+            var eventIpAddress = event.getIpAddress();
             for (int i = 0, end = ipAddressList.getCount (); i < end; ++i) {
-                BagObject ipAddress = ipAddressList.getBagObject (i);
+                var ipAddress = ipAddressList.getBagObject (i);
                 if (ipAddress != null) {
                     // in practice, only allow or deny should be set, but both are possible - if we
                     // get an explicit match, it is definitive
-                    String allow = ipAddress.getString (ALLOW);
+                    var allow = ipAddress.getString (ALLOW);
                     if ((allow != null) && (Pattern.compile (allow).matcher (eventIpAddress).find ())) {
                         // this ip address matched an "allow" regex
                         return EventFilterResult.ALLOW;
                     }
-                    String deny = ipAddress.getString (DENY);
+                    var deny = ipAddress.getString (DENY);
                     if ((deny != null) && (Pattern.compile (deny).matcher (eventIpAddress).find ())) {
                         // this ip address mathed a "deny" regex
                         return EventFilterResult.DENY;
@@ -78,9 +77,9 @@ public class EventFilter implements EventFilterHandler {
 
     protected EventFilterResult checkSecretList (Event event, BagArray secretList) {
         if (secretList != null) {
-            String secret = event.getQuery ().getString (Key.cat (Base.POST_DATA, SECRET));
+            var secret = event.getQuery ().getString (Key.cat (Base.POST_DATA, SECRET));
             for (int i = 0, end = secretList.getCount (); i < end; ++i) {
-                BagObject secretRecipe = secretList.getBagObject(i);
+                var secretRecipe = secretList.getBagObject(i);
                 if (Secret.check(secret, secretRecipe)) {
                     // the secret matched, this filter allows the event
                     return EventFilterResult.ALLOW;
@@ -96,9 +95,9 @@ public class EventFilter implements EventFilterHandler {
     protected EventFilterResult checkAnyList (Event event, BagArray anyList) {
         if (anyList != null) {
             for (int i = 0, end = anyList.getCount (); i < end; ++i) {
-                BagObject anyItem = anyList.getBagObject(i);
+                var anyItem = anyList.getBagObject(i);
                 if (anyItem != null) {
-                    EventFilterResult eventFilterResult = filterEvent (event, anyItem);
+                    var eventFilterResult = filterEvent (event, anyItem);
                     if (eventFilterResult != EventFilterResult.NOT_APPLICABLE) {
                         // any one of the child filters matched and returned a result, that's our result
                         return eventFilterResult;
@@ -115,9 +114,9 @@ public class EventFilter implements EventFilterHandler {
         //
         if (allList != null) {
             for (int i = 0, end = allList.getCount (); i < end; ++i) {
-                BagObject allItem = allList.getBagObject(i);
+                var allItem = allList.getBagObject(i);
                 if (allItem != null) {
-                    EventFilterResult eventFilterResult = filterEvent (event, allItem);
+                    var eventFilterResult = filterEvent (event, allItem);
                     if (eventFilterResult != EventFilterResult.ALLOW) {
                         // one of the child filters didn't match, we can early out on that
                         return EventFilterResult.DENY;
@@ -133,8 +132,8 @@ public class EventFilter implements EventFilterHandler {
 
     protected EventFilterResult filterEvent (Event event, BagObject filterConfiguration) {
         if (checkEventList (event, filterConfiguration)) {
-            String filterType = filterConfiguration.getString(FILTER_TYPE);
-            BagArray filterParmsList = filterConfiguration.getBagArray (filterType);
+            var filterType = filterConfiguration.getString(FILTER_TYPE);
+            var filterParmsList = filterConfiguration.getBagArray (filterType);
             switch (filterType) {
                 case IP_ADDRESS_LIST: return checkIpAddressList(event, filterParmsList);
                 case SECRET_LIST: return checkSecretList(event, filterParmsList);

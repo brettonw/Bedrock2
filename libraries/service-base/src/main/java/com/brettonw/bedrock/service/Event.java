@@ -6,7 +6,6 @@ import com.brettonw.bedrock.bag.BagObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.System;
 import javax.servlet.http.HttpServletRequest;
 
 import static com.brettonw.bedrock.service.Base.*;
@@ -42,13 +41,13 @@ public class Event {
     }
 
     public String getIpAddress () {
-        String ipAddress = request.getRemoteAddr ();
+        var ipAddress = request.getRemoteAddr ();
 
         // try to get the x-forwarded header, the last one...
-        String forwarding = request.getHeader ("x-forwarded-for");
+        var forwarding = request.getHeader ("x-forwarded-for");
         if (forwarding != null) {
-            String[] forwards = forwarding.split (",");
-            for (String forward : forwards) {
+            var forwards = forwarding.split (",");
+            for (var forward : forwards) {
                 forward = forward.trim ();
                 ipAddress = forward.split (":")[0];
             }
