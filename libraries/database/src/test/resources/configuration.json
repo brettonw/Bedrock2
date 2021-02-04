@@ -1,0 +1,7 @@
+{
+    "connection-string": "mongodb://bedrock-test:easy_password@database.brettonw.com/users",
+    "database-name": "bedrock-test",
+    "collection-names": [
+        "collection-test"
+    ]
+}

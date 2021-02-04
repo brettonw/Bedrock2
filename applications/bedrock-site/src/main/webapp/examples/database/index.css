@@ -1,0 +1,24 @@
+div[id="bedrock-database-container"] {
+    display: inline-block;
+    font-family: sans-serif;
+    text-align: left;
+    padding: 4px 0px;
+    width: 100%;
+}
+
+div[id="bedrock-database-display"] {
+    height: 500px;
+    border: solid;
+    border-width: 1px;
+    border-radius: 2px;
+    border-color: #bbb;
+}
+
+div[id="bedrock-record-display"] {
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+body.noScroll {
+    overflow: hidden;
+}

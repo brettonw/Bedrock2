@@ -1,0 +1,4 @@
+
+Project: bedrock@v1.6.5 (2021-01-27 18:10:13)
+Clean - bedrock in /Users/brettonw/Work/Bedrock/applications/bedrock-site
+Clean - Done
