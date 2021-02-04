@@ -15,3 +15,13 @@ buildNumber.properties
 
 # IntelliJ IDEA is my editor of choice
 .idea
+*.iml
+
+.settings
+.project
+.cache*
+
+# artifacts of our build process
+build*.txt
+/applications/bedrock-site/src/main/webapp/dist/*-SNAPSHOT
+/applications/bedrock-site/src/main/webapp/dist/latest
