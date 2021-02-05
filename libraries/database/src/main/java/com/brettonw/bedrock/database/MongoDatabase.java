@@ -68,24 +68,20 @@ public class MongoDatabase implements Interface, AutoCloseable {
         // check that everything is valid...
         if (databaseName != null) {
             if ((collectionNames != null) && (collectionNames.length > 0)) {
-                // 02/02/2021 - we know this uses the deprecated getAddress method, but haven't
-                // identified a better replacement option
-                @SuppressWarnings("deprecation")
-
                 // the first step is to get the clients, BUT... clients are retained in a hash for
                 // pooling purposes, so the actual first step is to see if we've already connected
                 // to this client.
                 var mongoClient = MONGO_CLIENTS.get (connectionString);
                 if (mongoClient == null) {
+                    // this is our first connection to the given client, so create the
+                    // connection, and then check that we can actually reach it by trying to do
+                    // something that requires a live connection, like get the first database name
+                    // from the database server. if that fails, we punt and return null...
                     try {
-                        // this is our first connection to the given client, so create the
-                        // connection, and then check that we can actually reach it by trying to do
-                        // something that requires a live connection, like get its address or a list
-                        // of available databases. if that fails, we punt and return null...
                         mongoClient = MongoClients.create(connectionString);
-                        mongoClient.listDatabaseNames ();
+                        mongoClient.listDatabaseNames ().first ();
                     } catch (Exception exception) {
-                        log.error ("Failed to connect to '" + connectionString + "'", exception);
+                        log.error ("Failed to connect to '" + databaseName + "'", exception);
                         return null;
                     }
 
@@ -121,21 +117,18 @@ public class MongoDatabase implements Interface, AutoCloseable {
 
     /**
      *
-     * @param connectionStringIn
+     * @param connectionString
      * @param databaseName
      * @param collectionNames
      * @return
      */
-    public static Map<String, MongoDatabase> connect (String connectionStringIn, String databaseName, String... collectionNames) {
-        var connectionString = (ConnectionString) null;
+    public static Map<String, MongoDatabase> connect (String connectionString, String databaseName, String... collectionNames) {
         try {
-            connectionString = new ConnectionString (connectionStringIn);
-        } catch (Exception exception) {
-            log.error ("Failed to connect to '" + connectionStringIn + "'", exception);
+            return connect (new ConnectionString (connectionString), databaseName, collectionNames);
+        } catch (IllegalArgumentException exception) {
+            log.error (exception);
             return null;
         }
-
-        return connect (connectionString, databaseName, collectionNames);
     }
 
     /**
