@@ -1,3 +1,4 @@
+<%@ page import="com.brettonw.bedrock.site.Service" %>
 </body>
 </html>
 

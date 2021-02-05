@@ -13,18 +13,9 @@
                 "description": "Lock the server.",
                 "strict": true,
                 "parameters": {
-                    "post-data": {
-                        "description": "POST data for security.",
-                        "required": true,
-                        "strict": true,
-                        "parameters": {
-                            "secret": { "description": "The secret used to verify the lock", "required":  true }
-                        }
-                    }
+                    "secret": { "description": "The secret used to verify the lock", "required":  true }
                 },
-                "example": {
-                    "post-data": { "secret": "xxxx1234" }
-                }
+                "example": { "secret": "xxxx1234" }
             },
             "ip-address": {
                 "description": "Get the IP address of the requestor.",
@@ -45,22 +36,6 @@
                 "description": "Repeat the contents of the query.",
                 "strict": false,
                 "example": { "param1": "xxx", "param2": "yyy" }
-            },
-            "echo-array": {
-                "description": "Repeat the contents of the query as the first element of an array.",
-                "strict": false,
-                "response": [],
-                "example": { "param1": "xxx", "param2": "yyy" }
-            },
-            "echo-post": {
-                "description": "Repeat the contents of the post-data.",
-                "strict": true,
-                "parameters": {
-                    "post-data": { "description": "POST data to be echoed.", "required": true, "strict": false}
-                },
-                "example": {
-                    "post-data": { "param1": "xxx", "param2": "yyy" }
-                }
             },
             "fetch": {
                 "description": "Get the content response from a requested URL.",

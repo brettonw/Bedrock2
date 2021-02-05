@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="com.brettonw.bedrock.Service" %>
+<%@ page import="com.brettonw.bedrock.site.Service" %>
 <!DOCTYPE html>
 <html>
 <head>

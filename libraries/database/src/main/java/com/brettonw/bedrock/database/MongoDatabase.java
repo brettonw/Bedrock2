@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+// http://mongodb.github.io/mongo-java-driver/
 public class MongoDatabase implements Interface, AutoCloseable {
     private static final Logger log = LogManager.getLogger (MongoDatabase.class);
 
