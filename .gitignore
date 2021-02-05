@@ -22,6 +22,6 @@ buildNumber.properties
 .cache*
 
 # artifacts of our build process
-build*.txt
+buil*.txt
 /applications/bedrock-site/src/main/webapp/dist/*-SNAPSHOT
 /applications/bedrock-site/src/main/webapp/dist/latest
