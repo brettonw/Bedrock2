@@ -255,6 +255,7 @@ public class Base extends HttpServlet {
         }
 
         // extract the bedrock data that's been posted, we require that it's a JSON object
+        log.debug ("Extract POST data for (" + mimeType + ") on " + request.getQueryString());
         var sourceAdapter = new SourceAdapterReader(request.getInputStream (), mimeType);
         var requestString = sourceAdapter.getStringData ();
         var query = BagObjectFrom.string (requestString, mimeType);

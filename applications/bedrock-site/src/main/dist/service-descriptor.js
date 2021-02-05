@@ -1,19 +1,6 @@
 Bedrock.ServiceDescriptor = function () {
     let $ = Object.create (null);
 
-    $.get = function (queryString, onSuccess) {
-        let request = new XMLHttpRequest ();
-        request.overrideMimeType ("application/json");
-        request.open ("GET", queryString, true);
-        request.onload = function (event) {
-            if (request.status === 200) {
-                let response = JSON.parse (this.responseText);
-                onSuccess (response);
-            }
-        };
-        request.send ();
-    };
-
     $.tryExample = function (exampleName) {
         // show the result
         let hoverBoxRoot = document.getElementById ("bedrock-service-descriptor-hover-box");
@@ -207,7 +194,7 @@ Bedrock.ServiceDescriptor = function () {
 
     // a little black raincloud, of course
     $.display = function (displayInDivId) {
-        Bedrock.ServiceBase.get ({event: "help"}, function (response) {
+        Bedrock.ServiceBase.post ({}, {event: "help"}, function (response) {
             response = (response.response !== undefined) ? response.response : response;
             document.getElementById(displayInDivId).innerHTML = Bedrock.ServiceDescriptor.displaySpecification (response);
         });

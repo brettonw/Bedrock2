@@ -10,5 +10,9 @@
         <Root level="warn">
             <AppenderRef ref="Console" />
         </Root>
+        <Logger name="com.brettonw.bedrock.service" level="debug"/>
+        <Root level="warn">
+            <AppenderRef ref="Console" />
+        </Root>
     </Loggers>
 </Configuration>
