@@ -77,7 +77,7 @@ public class EventFilter implements EventFilterHandler {
 
     protected EventFilterResult checkSecretList (Event event, BagArray secretList) {
         if (secretList != null) {
-            var secret = event.getQuery ().getString (Key.cat (Base.POST_DATA, SECRET));
+            var secret = event.getQuery ().getString (SECRET);
             for (int i = 0, end = secretList.getCount (); i < end; ++i) {
                 var secretRecipe = secretList.getBagObject(i);
                 if (Secret.check(secret, secretRecipe)) {

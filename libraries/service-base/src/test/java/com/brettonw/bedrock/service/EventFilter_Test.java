@@ -13,14 +13,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class EventFilter_Test extends EventFilter {
     @Test
     public void testAllow () {
-        BagObject filterConfiguration = BagObject.open(FILTER_TYPE, ALLOW);
-        Event event = new Event (BagObject.open (Base.EVENT, Base.OK), null);
+        var filterConfiguration = BagObject.open(FILTER_TYPE, ALLOW);
+        var event = new Event (BagObject.open (Base.EVENT, Base.OK), null);
         assertEquals (filterEvent(event, filterConfiguration), EventFilterResult.ALLOW);
     }
 
     @Test
     public void testEventApplies () {
-        Event event = new Event (BagObject.open (Base.EVENT, Base.OK), null);
+        var event = new Event (BagObject.open (Base.EVENT, Base.OK), null);
         assertTrue (checkEventList(event, BagObject.open(EVENT_LIST, BagArray.open (Base.OK))));
         assertFalse (checkEventList(event, BagObject.open(EVENT_LIST, BagArray.open ("junk"))));
         assertFalse (checkEventList(event, BagObject.open(EVENT_LIST, BagArray.open ("junk").add ("junk2"))));
@@ -31,9 +31,9 @@ public class EventFilter_Test extends EventFilter {
 
     @Test
     public void testFilterEvent () {
-        BagObject query = BagObject.open (Base.EVENT, Base.OK);
-        Event event = new Event (query, new TestRequest (query.toString(MimeType.JSON)));
-        BagObject filterConfiguration = BagObject
+        var query = BagObject.open (Base.EVENT, Base.OK);
+        var event = new Event (query, new TestRequest (query.toString(MimeType.JSON)));
+        var filterConfiguration = BagObject
                 .open (FILTER_TYPE, ANY_LIST)
                 .put (ANY_LIST,
                         BagArray

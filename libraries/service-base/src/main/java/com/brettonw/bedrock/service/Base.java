@@ -39,7 +39,6 @@ public class Base extends HttpServlet {
     public static final String PARAMETERS = "parameters";
     public static final String POM_NAME = "pom-name";
     public static final String POM_VERSION = "pom-version";
-    public static final String POST_DATA = "post-data";
     public static final String QUERY = "query";
     public static final String REQUIRED = "required";
     public static final String RESPONSE = "response";
@@ -337,29 +336,6 @@ public class Base extends HttpServlet {
                         var validationErrors = new BagArray ();
                         validateParameters (query, strict, parameterSpecification, validationErrors);
 
-                        // validate the post-data parameters
-                        if ((parameterSpecification != null) && query.has (POST_DATA)) {
-                            // check to see if there is a parameter specification for the post data
-                            var postDataEventSpecification = parameterSpecification.getBagObject (POST_DATA);
-                            if (postDataEventSpecification != null) {
-                                strict = postDataEventSpecification.getBoolean (STRICT, () -> true);
-                                var postDataParameterSpecification = postDataEventSpecification.getBagObject (PARAMETERS);
-                                if (postDataParameterSpecification != null) {
-                                    // if post data is an array - iterate over all of them
-                                    var queryPostDataArray = query.getBagArray (POST_DATA);
-                                    if (queryPostDataArray != null) {
-                                        for (int i = 0, end = queryPostDataArray.getCount (); i < end; ++i) {
-                                            var queryPostData = queryPostDataArray.getBagObject (i);
-                                            validateParameters (queryPostData, strict, postDataParameterSpecification, validationErrors);
-                                        }
-                                    } else {
-                                        var queryPostData = query.getBagObject (POST_DATA);
-                                        validateParameters (queryPostData, strict, postDataParameterSpecification, validationErrors);
-                                    }
-                                }
-                            }
-                        }
-
                         // if the validation passed
                         if (validationErrors.getCount () == 0) {
                             // give an opportunity to filter the event before it happens
@@ -468,7 +444,7 @@ public class Base extends HttpServlet {
     }
 
     public void handleEventMultiple (Event event) {
-        var eventsArray = event.getQuery ().getBagArray (POST_DATA);
+        var eventsArray = event.getQuery ().getBagArray (EVENTS);
         if (eventsArray != null) {
             var eventCount = eventsArray.getCount ();
             var results = new BagArray (eventCount);
@@ -478,7 +454,7 @@ public class Base extends HttpServlet {
             }
             event.ok (results);
         } else {
-            event.error ("No events found (expected an array in '" + POST_DATA + "')");
+            event.error ("No events found (expected an array in '" + EVENTS + "')");
         }
     }
 }

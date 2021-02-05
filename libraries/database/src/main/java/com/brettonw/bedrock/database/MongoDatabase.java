@@ -2,12 +2,14 @@ package com.brettonw.bedrock.database;
 
 import com.brettonw.bedrock.bag.*;
 import com.brettonw.bedrock.bag.formats.MimeType;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
+
+import com.mongodb.client.*;
+import com.mongodb.client.model.*;
+import com.mongodb.*;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -26,7 +28,7 @@ public class MongoDatabase implements Interface, AutoCloseable {
     public static final String COLLECTION_NAME = "collection-name";
     public static final String COLLECTION_NAMES = "collection-names";
 
-    private static final Map<MongoClientURI, MongoClient> MONGO_CLIENTS = new HashMap<> ();
+    private static final Map<ConnectionString, MongoClient> MONGO_CLIENTS = new HashMap<> ();
 
     private final String databaseName;
     private final String collectionName;
@@ -57,12 +59,12 @@ public class MongoDatabase implements Interface, AutoCloseable {
 
     /**
      *
-     * @param clientUri
+     * @param connectionString
      * @param databaseName
      * @param collectionNames
      * @return
      */
-    public static Map<String, MongoDatabase> connect (MongoClientURI clientUri, String databaseName, String... collectionNames) {
+    public static Map<String, MongoDatabase> connect (ConnectionString connectionString, String databaseName, String... collectionNames) {
         // check that everything is valid...
         if (databaseName != null) {
             if ((collectionNames != null) && (collectionNames.length > 0)) {
@@ -73,23 +75,23 @@ public class MongoDatabase implements Interface, AutoCloseable {
                 // the first step is to get the clients, BUT... clients are retained in a hash for
                 // pooling purposes, so the actual first step is to see if we've already connected
                 // to this client.
-                var mongoClient = MONGO_CLIENTS.get (clientUri);
+                var mongoClient = MONGO_CLIENTS.get (connectionString);
                 if (mongoClient == null) {
                     try {
                         // this is our first connection to the given client, so create the
                         // connection, and then check that we can actually reach it by trying to do
                         // something that requires a live connection, like get its address or a list
                         // of available databases. if that fails, we punt and return null...
-                        mongoClient = new MongoClient (clientUri);
-                        mongoClient.getAddress ();
+                        mongoClient = MongoClients.create(connectionString);
+                        mongoClient.listDatabaseNames ();
                     } catch (Exception exception) {
-                        log.error ("Failed to connect to '" + clientUri + "'", exception);
+                        log.error ("Failed to connect to '" + connectionString + "'", exception);
                         return null;
                     }
 
                     // we successfully connected to a valid mongo client, so retain this client
                     // for future use...
-                    MONGO_CLIENTS.put (clientUri, mongoClient);
+                    MONGO_CLIENTS.put (connectionString, mongoClient);
                 }
 
                 // the next step is to get the database, and then the individual collections.
@@ -119,21 +121,21 @@ public class MongoDatabase implements Interface, AutoCloseable {
 
     /**
      *
-     * @param connectionString
+     * @param connectionStringIn
      * @param databaseName
      * @param collectionNames
      * @return
      */
-    public static Map<String, MongoDatabase> connect (String connectionString, String databaseName, String... collectionNames) {
-        var mongoClientUri = (MongoClientURI) null;
+    public static Map<String, MongoDatabase> connect (String connectionStringIn, String databaseName, String... collectionNames) {
+        var connectionString = (ConnectionString) null;
         try {
-            mongoClientUri = new MongoClientURI (connectionString);
+            connectionString = new ConnectionString (connectionStringIn);
         } catch (Exception exception) {
-            log.error ("Failed to connect to '" + connectionString + "'", exception);
+            log.error ("Failed to connect to '" + connectionStringIn + "'", exception);
             return null;
         }
 
-        return connect (mongoClientUri, databaseName, collectionNames);
+        return connect (connectionString, databaseName, collectionNames);
     }
 
     /**

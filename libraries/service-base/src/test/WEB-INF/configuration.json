@@ -9,7 +9,7 @@
             "multiple": {
                 "description": "Handle multiple events in array format.",
                 "parameters": {
-                    "post-data": { "description": "An array of other events", "required": true }
+                    "events": { "description": "An array of other events", "required": true }
                 }
             },
             "hello": {
@@ -28,8 +28,9 @@
                     "param1": {"description": "1st Parameter", "required": true },
                     "param2": {"description": "2nd Parameter", "required": true },
                     "param3": {"description": "3rd Parameter"},
-                    "post-data/test1": {"description": "a list of other stuff", "required": true}
-                }
+                    "testPost": {"description": "a list of other stuff", "required": true}
+                },
+                "example": { "param1": "xxx", "param2": "yyy", "test1": [ "hello hello" ] }
             },
             "ok": {
                 "description": "Ok.",

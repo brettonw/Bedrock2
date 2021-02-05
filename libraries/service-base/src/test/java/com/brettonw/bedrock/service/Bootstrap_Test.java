@@ -29,10 +29,13 @@ public class Bootstrap_Test extends Base {
         event.ok ();
     }
 
-    private void assertGet (BagObject bagObject, BagObject query) {
-        assertTrue (bagObject.getString (STATUS).equals (OK));
-        bagObject = bagObject.getBagObject (QUERY).select (new SelectKey (SelectType.EXCLUDE, POST_DATA));
-        assertTrue (bagObject.equals (query));
+    private BagObject bagObjectFromPost (BagObject query) throws IOException {
+        return tester.bagObjectFromPost(new BagObject (), query);
+    }
+
+    private void assertQuery(BagObject bagObject, BagObject query, String status) {
+        assertTrue (bagObject.getString (STATUS).equals (status));
+        assertTrue (bagObject.getBagObject (QUERY).equals (query));
     }
 
     @Test
@@ -50,13 +53,13 @@ public class Bootstrap_Test extends Base {
     @Test
     public void testUnknownEvent () throws IOException {
         BagObject query = BagObject.open (EVENT, "nohandler");
-        assertTrue (tester.bagObjectFromGet (query).getString (STATUS).equals (ERROR));
+        assertTrue (bagObjectFromPost (query).getString (STATUS).equals (ERROR));
     }
 
     @Test
     public void testMissingHandler () throws IOException {
         BagObject query = BagObject.open (EVENT, "no-handler");
-        assertTrue (tester.bagObjectFromGet (query).getString (STATUS).equals (ERROR));
+        assertTrue (bagObjectFromPost (query).getString (STATUS).equals (ERROR));
     }
 
     @Test
@@ -65,53 +68,48 @@ public class Bootstrap_Test extends Base {
                 .open (EVENT, "hello")
                 .put ("param1", 1)
                 .put ("param2", 2);
-        assertGet (tester.bagObjectFromGet (query), query);
-
-        query.put ("param3", 3);
-        assertGet (tester.bagObjectFromGet (query), query);
-
-        query.put ("param4", 4);
-        assertTrue (tester.bagObjectFromGet (query).getString (STATUS).equals (OK));
+        assertTrue (tester.bagObjectFromGet (query).getString (STATUS).equals (ERROR));
     }
 
     @Test
-    public void testGetOk () throws IOException {
+    public void testPostOk () throws IOException {
         BagObject query = BagObject.open (EVENT, OK);
-        assertGet (tester.bagObjectFromGet (query), query);
+        assertQuery(bagObjectFromPost (query), query, OK);
 
         query.put ("param4", 4);
-        assertGet (tester.bagObjectFromGet (query), query);
+        assertQuery(bagObjectFromPost (query), query, OK);
     }
 
     @Test
     public void testPost () throws IOException {
+        BagObject testPost = BagObjectFrom.resource (getClass (), "/testPost.json");
         BagObject query = BagObject
                 .open (EVENT, "goodbye")
                 .put ("param1", 1)
-                .put ("param2", 2);
-        BagObject postData = BagObjectFrom.resource (getClass (), "/testPost.json");
-        BagObject response = tester.bagObjectFromPost (query, postData);
-        assertGet (response, query);
-        assertTrue (response.getBagObject (QUERY).has (POST_DATA));
-        assertTrue (response.getBagObject (QUERY).getBagObject (POST_DATA).equals (postData));
+                .put ("param2", 2)
+                .put ("testPost", testPost);
+        BagObject response = bagObjectFromPost (query);
+        assertQuery(response, query, OK);
+        assertTrue (response.getBagObject (QUERY).has ("testPost"));
+        assertTrue (response.getBagObject (QUERY).getBagObject ("testPost").equals (testPost));
 
         query.put ("param3", 3);
-        response = tester.bagObjectFromPost (query, postData);
-        assertGet (response, query);
-        assertTrue (response.getBagObject (QUERY).has (POST_DATA));
-        assertTrue (response.getBagObject (QUERY).getBagObject (POST_DATA).equals (postData));
+        response = bagObjectFromPost (query);
+        assertQuery(response, query, OK);
+        assertTrue (response.getBagObject (QUERY).has ("testPost"));
+        assertTrue (response.getBagObject (QUERY).getBagObject ("testPost").equals (testPost));
 
         query.put ("param4", 4);
-        assertTrue (tester.bagObjectFromPost (query, postData).getString (STATUS).equals (OK));
+        assertTrue (bagObjectFromPost (query).getString (STATUS).equals (OK));
         query.remove ("param4");
 
         query.put ("param3", 2);
-        assertTrue (tester.bagObjectFromPost (query, postData).getString (STATUS).equals (OK));
+        assertTrue (bagObjectFromPost (query).getString (STATUS).equals (OK));
     }
 
     @Test
     public void testEmptyRequest () throws IOException {
-        BagObject response = tester.bagObjectFromGet ("");
+        BagObject response = bagObjectFromPost (new BagObject ());
         assertTrue (response.getString (STATUS).equals (ERROR));
         assertTrue (response.getString (Key.cat (ERROR, 0)).equals ("Missing '" + EVENT + "'"));
     }
@@ -119,7 +117,7 @@ public class Bootstrap_Test extends Base {
     @Test
     public void testHelp () throws IOException {
         BagObject query = BagObject.open (EVENT, HELP);
-        BagObject response = tester.bagObjectFromGet (query);
+        BagObject response = bagObjectFromPost (query);
         assertTrue (response.getString (STATUS).equals (OK));
 
         // make sure the response matches the schema
@@ -127,12 +125,12 @@ public class Bootstrap_Test extends Base {
     }
 
     @Test
-    public void testBadGet () throws IOException {
+    public void testBadPost () throws IOException {
         BagObject query = BagObject
                 .open (EVENT, "halp")
                 .put ("param1", 1)
                 .put ("param2", 2);
-        assertTrue (tester.bagObjectFromGet (query).getString (STATUS).equals (ERROR));
+        assertTrue (bagObjectFromPost (query).getString (STATUS).equals (ERROR));
     }
 
     @Test
@@ -141,27 +139,32 @@ public class Bootstrap_Test extends Base {
                 .open (EVENT, "hello")
                 .put ("param1", 1)
                 .put ("param3", 3);
-        assertTrue (tester.bagObjectFromGet (query).getString (STATUS).equals (OK));
+        assertTrue (bagObjectFromPost (query).getString (STATUS).equals (OK));
     }
 
     @Test
     public void testVersion () throws IOException {
         BagObject query = BagObject.open (EVENT, VERSION);
-        BagObject response = tester.bagObjectFromGet (query);
+        BagObject response = bagObjectFromPost (query);
         assertTrue (response.getString (STATUS).equals (OK));
     }
 
     @Test
     public void testMultiple () throws IOException {
-        BagObject query = BagObject.open (EVENT, MULTIPLE);
-        BagArray postData = BagArray.open (BagObject.open (EVENT, VERSION)).add (BagObject.open (EVENT, "help"));
-        assertTrue (tester.bagObjectFromPost (query, query).getString (STATUS).equals (ERROR));
-        assertTrue (tester.bagObjectFromPost (query, postData).getString (STATUS).equals (OK));
+        BagObject query = BagObject
+                .open (EVENT, MULTIPLE)
+                .put (EVENTS, BagArray
+                        .open (BagObject.open (EVENT, VERSION))
+                        .add (BagObject.open (EVENT, HELP))
+                        .add (BagObject.open (EVENT, OK))
+                );
+        var response = bagObjectFromPost (query);
+        assertQuery (response, query, OK);
     }
 
     @Test
     public void testDashName () throws IOException {
         BagObject query = BagObject.open (EVENT, "dash-name");
-        assertGet (tester.bagObjectFromGet (query), query);
+        assertQuery(bagObjectFromPost (query), query, OK);
     }
 }
