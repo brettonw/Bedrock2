@@ -2,10 +2,10 @@
     "log-file": "/usr/local/tomcat/logs/catalina.out",
     "schema": {
         "name": "Bedrock Service",
-        "description": "Bedrock Service is a simple JSON repeater designed to demonstrate a simple API and be used in test suites requiring JSON responses from a remote host, such as com.brettonw.bedrock.",
+        "description": "Bedrock Service is a simple example designed to demonstrate use of the Bedrock Microservice Architecture and API.",
         "events": {
             "ok": {
-                "description": "Get an empty response, with status Ok.",
+                "description": "Return an empty response, with status Ok.",
                 "strict": false,
                 "example": {}
             },
@@ -18,32 +18,28 @@
                 "example": { "secret": "xxxx1234" }
             },
             "ip-address": {
-                "description": "Get the IP address of the requestor.",
+                "description": "Return the IP address of the requestor.",
                 "response": {
                     "ip": { "description": "IP (v4) address of the requestor.", "required": true }
                 },
                 "example": {}
             },
             "headers": {
-                "description": "Get the HTTP request headers.",
+                "description": "Return the HTTP request headers.",
                 "response": {
                     "host": { "description":"Name of the host the request is to." },
                     "user-agent": { "description":"Browser user agent." }
                 },
                 "example": {}
             },
-            "fetch": {
-                "description": "Get the content response from a requested URL.",
-                "published": false,
+            "log-file": {
+                "description": "Return the server's log file contents.",
+                "strict": true,
                 "parameters": {
-                    "url": { "description": "Site URL to fetch. The URL may need to be 'escaped' if it contains special characters. Use the unicode hexadecimal equivalent for certain special characters, such as '%3d' for '='.", "required":  true }
+                    "line-count": { "description": "The number of lines from the log file to return (default is 100)", "required":  false }
                 },
-                "response": {
-                    "content": {"description": "Content response from requested site, escaped appropriately.", "required": true},
-                    "mime-type": {"description": "MIME type of the content.", "required": true},
-                    "escape-type": {"description": "Method of escaping/encoding content response to enable it to be enclosed in a JSON tag.", "required": true}
-                },
-                "example": { "url": "https://bedrock.brettonw.com/api?event%3dok" }
+                "response": [],
+                "example": { "line-count":  200 }
             }
         }
     },

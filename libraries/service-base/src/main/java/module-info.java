@@ -1,5 +1,5 @@
 module com.brettonw.bedrock.service {
-    requires tomcat.servlet.api;
+    requires java.servlet;
     requires org.apache.commons.io;
     requires com.brettonw.bedrock.bag;
     requires com.brettonw.bedrock.secret;

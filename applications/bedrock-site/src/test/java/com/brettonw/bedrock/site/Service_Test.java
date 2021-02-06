@@ -1,12 +1,10 @@
 package com.brettonw.bedrock.site;
 
-import com.brettonw.bedrock.bag.BagArray;
 import com.brettonw.bedrock.bag.BagObject;
-import com.brettonw.bedrock.bag.BagObjectFrom;
 import com.brettonw.bedrock.servlet.Tester;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 
@@ -15,9 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class Service_Test extends Service {
     private static final Logger log = LogManager.getLogger (Service_Test.class);
 
-    public static final String ECHO = "echo";
     public static final String HEADERS = "headers";
-    public static final String FETCH = "fetch";
 
     Tester tester;
 
