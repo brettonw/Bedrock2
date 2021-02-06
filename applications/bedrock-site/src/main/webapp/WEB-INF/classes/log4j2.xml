@@ -7,7 +7,6 @@
     </Appenders>
     <Loggers>
         <Logger name="com.brettonw" level="info"/>
-        <Logger name="com.brettonw.bedrock.service" level="debug"/>
         <Root level="warn">
             <AppenderRef ref="Console" />
         </Root>
