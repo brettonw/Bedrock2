@@ -24,9 +24,9 @@ Bedrock.ServiceBase = function () {
     $.postWithFullResponse = function (event, parameters, onSuccess, onFailure, queryUrl) {
         queryUrl = $.getQueryUrl(queryUrl);
 
-        // build the event description, we force the event to be specified to avoid the super common
-        // case of the caller building an object with just an event, and we copy other parameters in
-        // to the object that we will subsequently turn into a JSON string
+        // build the event description, we force the event name to be specified to avoid the super
+        // common case of the caller building an object with just an event, and we copy other
+        // parameters in to the object that we will subsequently turn into a JSON string
         let postData = {};
         if ((typeof parameters === "object") && (parameters !== null)) {
             Object.assign(postData, parameters);
@@ -34,20 +34,42 @@ Bedrock.ServiceBase = function () {
         postData.event = event;
         postData = JSON.stringify(postData);
 
-        // post the query to the server...
-        Bedrock.Http.post (queryUrl, postData, function (response) {
-            LOG (INFO, query + " (status: " + response.status + ")");
-            if (response.status === "ok") {
-                if (onSuccess instanceof Function) {
-                    onSuccess(response);
-                }
-            } else if (onFailure instanceof Function) {
-                onFailure (response);
-            } else {
-                // default on failure, alert...
-                alert (response.error);
+        // a fail function
+        let fail = function (errorResponse) {
+            if (onFailure instanceof Function) {
+                onFailure ((typeof errorResponse === "string") ? { error: errorResponse } : errorResponse);
             }
-        });
+        };
+
+        // post the query to the server...
+        let request = new XMLHttpRequest ();
+        request.onload = function (progressEvent) {
+            // http status 200 is "OK", the request has succeeded and completed
+            if (request.status === 200) {
+                let response = JSON.parse (this.responseText);
+                LOG (INFO, query + " (status: " + response.status + ")");
+                if ((!("status" in response)) || (response.status === "ok")) {
+                    if (onSuccess instanceof Function) {
+                        onSuccess(response);
+                    }
+                } else {
+                    fail (response);
+                }
+            }
+        };
+
+        // don't take more than a few seconds
+        request.timeout = 3000;
+        request.ontimeout = function (progressEvent) { fail ("request took more than " + request.timeout + " ms"); };
+        request.onerror = function () { fail ("request could not be completed" ); };
+        request.onabort = function () { fail ("request aborted"); };
+
+        // POST should always bypass the cache
+        request.open ("POST", queryUrl + "?" + Date.now(), true);
+
+        // send the JSON formatted data
+        request.setRequestHeader("Content-Type", "application/json");
+        request.send (postData);
     };
 
     /**

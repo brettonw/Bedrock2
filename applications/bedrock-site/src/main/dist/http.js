@@ -9,7 +9,6 @@ Bedrock.Http = function () {
                 onSuccess (response);
             }
         };
-        request.overrideMimeType ("application/json");
         request.open ("GET", queryString, true);
         request.send ();
     };
@@ -23,7 +22,6 @@ Bedrock.Http = function () {
             }
         };
         request.open ("POST", queryString, true);
-        request.overrideMimeType ("application/json");
         request.send (postData);
     };
 
