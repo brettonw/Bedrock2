@@ -47,26 +47,9 @@ public class Service_Test extends Service {
     }
 
     @Test
-    public void testPostEcho () throws IOException {
-        BagObject query = BagObject.open (EVENT, ECHO);
-        BagObject response = bagObjectFromPost (query);
-        assertTrue (response.equals (query));
-    }
-
-    @Test
     public void testPostHeaders () throws IOException {
         BagObject query = BagObject.open (EVENT, HEADERS);
         BagObject response = bagObjectFromPost (query);
-        assertTrue (response.getString (STATUS).equals (OK));
-    }
-
-    @Test
-    public void testPostFetch () throws IOException {
-        BagObject query = BagObject.open (EVENT, FETCH).put (FETCH_URL, "https://bedrock.brettonw.com/api?event%3dok");
-        BagObject response = bagObjectFromPost (query);
-        assertTrue (response.getString (STATUS).equals (OK));
-        query.put (FETCH_URL, "https://google.com");
-        response = bagObjectFromPost (query);
         assertTrue (response.getString (STATUS).equals (OK));
     }
 

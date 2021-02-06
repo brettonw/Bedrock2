@@ -32,11 +32,6 @@
                 },
                 "example": {}
             },
-            "echo": {
-                "description": "Repeat the contents of the query.",
-                "strict": false,
-                "example": { "param1": "xxx", "param2": "yyy" }
-            },
             "fetch": {
                 "description": "Get the content response from a requested URL.",
                 "published": false,

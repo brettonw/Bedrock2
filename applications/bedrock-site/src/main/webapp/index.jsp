@@ -10,7 +10,7 @@
     <div class="description-div">
         <ul>
             <li><a href="interface.jsp">Test Interface</a> - an example of the bedrock service and the service descriptor. </li>
-            <li>Find the sources on Github @ <a href="https://github.com/brettonw/bedrock">brettonw/Bedrock</a>.</li>
+            <li>Find the sources on Github @ <a href="https://github.com/brettonw/bedrock2">brettonw/Bedrock2</a>.</li>
         </ul>
     </div>
 

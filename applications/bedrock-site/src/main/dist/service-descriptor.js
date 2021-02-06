@@ -1,6 +1,9 @@
 Bedrock.ServiceDescriptor = function () {
     let $ = Object.create (null);
 
+    const EVENT_HELP = "help";
+
+
     $.tryExample = function (exampleName) {
         // show the result
         let hoverBoxRoot = document.getElementById ("bedrock-service-descriptor-hover-box");
@@ -10,53 +13,23 @@ Bedrock.ServiceDescriptor = function () {
         hoverBoxRoot.style.visibility = "visible";
         event.stopPropagation();
 
-        Bedrock.ServiceBase.get ({ event : "help" }, function (response) {
-            // get the example and explicitly set the event in it (it's typically omitted for simplicity in the configurations)
+        Bedrock.ServiceBase.post (EVENT_HELP, {}, function (response) {
+            // get the example, we know it's there because the link to it wouldn't have been created
+            // in the display call if it wasn't
             let example = response.events[exampleName].example;
-            example.event = exampleName;
-
-            let url;
-            let postData = null;
-
-            let handleExampleResponse = function (exampleResponse) {
-                let innerHTML = Html.Builder.begin ("div");
-                innerHTML.add("h2", { style: { margin: 0 }, innerHTML: "Example for " + exampleName });
-                if (postData != null) {
-                    innerHTML
-                        .begin ("div", { style: { margin: "16px 0" }})
-                        .add ("div", { style:  { fontWeight: "bold", display: "inline-block", width: "80px" }, innerHTML: "URL: " })
-                        .add ("div", { style:  { display: "inline-block" }, innerHTML: url.replace (/&/g, "&amp;")  })
-                        .end ()
-                        .add ("div", { style: { margin: "16px 0 8px 0", fontWeight: "bold" }, innerHTML: "Post JSON: " })
-                        .add ("pre", { class: "code-pre", innerHTML: postData })
-                } else {
-                    innerHTML
-                        .begin ("div", { style: { margin: "16px 0" }})
-                        .add ("div", { style:  { fontWeight: "bold", display: "inline-block", width: "80px" }, innerHTML: "URL: " })
-                        .add ("a", { style:  { display: "inline-block", textDecoration: "none" }, innerHTML: url.replace (/&/g, "&amp;"), href: url, target: "_blank"  })
-                        .end ();
-                }
-                innerHTML
+            Bedrock.ServiceBase.postWithFullResponse(exampleName, example, function (exampleResponse) {
+                let innerHTML = Html.Builder
+                    .begin ("div")
+                    .add("h2", { style: { margin: 0 }, innerHTML: "Example for '" + exampleName + "'" })
+                    .begin ("div", { style: { margin: "16px 0" }})
                     .add ("div", { style:  { margin: "16px 0 8px 0", fontWeight: "bold" }, innerHTML: "Response JSON: " })
                     .add ("pre", { class: "code-pre", innerHTML: JSON.stringify (exampleResponse, null, 4) })
-
-                hoverBoxBufferElement.appendChild(innerHTML.end ());
-            };
-
-            // if the example includes post data...
-            if ("post-data" in example) {
-                // separate the post data and issue the example request as a post
-                postData = JSON.stringify (example["post-data"], null, 4);
-                delete example["post-data"];
-                url = Bedrock.ServiceBase.getQuery (example);
-                Bedrock.Http.post (url, postData, handleExampleResponse);
-            } else {
-                // issue the example request as a get
-                url = Bedrock.ServiceBase.getQuery (example);
-                Bedrock.Http.get(url, handleExampleResponse);
-            }
-        }, function (error) {
-            hoverBoxBufferElement.appendChild (Html.Builder.begin ("div", { innerHTML: "ERROR: " + error}).end ());
+                    .end ()
+                    .end ();
+                hoverBoxBufferElement.appendChild(innerHTML);
+            }, function (exampleResponse) {
+                hoverBoxBufferElement.appendChild (Html.Builder.begin ("div", { innerHTML: "ERROR: " + exampleResponse.error}).end ());
+            });
         });
     };
 
@@ -194,17 +167,14 @@ Bedrock.ServiceDescriptor = function () {
 
     // a little black raincloud, of course
     $.display = function (displayInDivId) {
-        Bedrock.ServiceBase.post ({}, {event: "help"}, function (response) {
-            response = (response.response !== undefined) ? response.response : response;
+        Bedrock.ServiceBase.post(EVENT_HELP, {}, function (response) {
             document.getElementById(displayInDivId).innerHTML = Bedrock.ServiceDescriptor.displaySpecification (response);
         });
     };
 
     // convert the names into camel-case names (dashes are removed and the following character is uppercased)
     let makeName = function (input) {
-        return input.replace (/-([^-])/g, function replacer (match, p1, offset, string) {
-            return p1.toUpperCase();
-        });
+        return input.replace (/-([^-])/g, (match, p1, offset, string) => p1.toUpperCase());
     };
 
     $.translateResponse = function (response) {
@@ -230,29 +200,19 @@ Bedrock.ServiceDescriptor = function () {
         }
     };
 
-    // create a client side object with all of the api's
-    $.api = function (onSuccess, baseUrl = "", apiSource = "") {
-        // condition the inputs
-        baseUrl = (baseUrl === "") ? location.href.substr(0,location.href.lastIndexOf("/")) : baseUrl;
-        baseUrl = baseUrl.replace (/\/$/g, "");
-
-        // get the api
-        const API_EVENT_HELP = "api?event=help";
-        let url = (apiSource === "") ? (baseUrl + "/" + API_EVENT_HELP) : apiSource;
-        $.get (url, function (response) {
-            // if we retrieved the api.json from the service base, get the actual response
-            response = (response.response !== undefined) ? response.response : response;
-
+    // create a client side object with all of the api's for the host server
+    $.api = function (onSuccess, onFailure, queryUrl) {
+        Bedrock.ServiceBase.post(EVENT_HELP, {}, function (response) {
+            // XXX this is on hold for the moment, it's a distraction
+            /*
             // start with an empty build
             let api = Object.create (null);
             api.specification = response;
 
             // check that we got a response with events
             if ("events" in response) {
-                let events = response.events;
-                let eventNames = Object.keys (events);
-                for (let eventName of eventNames) {
-                    let event = events[eventName];
+                for (let eventName of Object.keys (response.events)) {
+                    let event = response.events[eventName];
 
                     // set up the function name and an empty parameter list
                     let functionName = makeName (eventName);
@@ -273,7 +233,7 @@ Bedrock.ServiceDescriptor = function () {
                         }
                     }
                     functionParameters += ((first !== true) ? ", " : "") + "onSuccess";
-                    functionBody += '    Bedrock.ServiceDescriptor.get (url, function (response) {\n';
+                    functionBody += '    Bedrock.ServiceBase.post (\"" + eventName + "\", function (response) {\n';
                     functionBody += '        if (response.status === "ok") {\n';
                     functionBody += '            response = Bedrock.ServiceDescriptor.translateResponse (response.response);\n';
                     functionBody += '            onSuccess (response);\n';
@@ -290,7 +250,8 @@ Bedrock.ServiceDescriptor = function () {
 
             // call the completion routine
             onSuccess (api);
-        });
+            */
+        }, onFailure, queryUrl);
     };
 
     return $;

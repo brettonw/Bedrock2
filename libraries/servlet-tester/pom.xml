@@ -25,9 +25,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>${servlet.version}</version>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-servlet-api</artifactId>
+            <version>${tomcat.version}</version>
         </dependency>
     </dependencies>
 </project>
