@@ -1,8 +1,8 @@
 package com.brettonw.bedrock.bag;
 
 import com.brettonw.bedrock.bag.test.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.brettonw.bedrock.logger.*;
+
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalTime;

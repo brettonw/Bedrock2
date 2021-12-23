@@ -2,8 +2,8 @@ package com.brettonw.bedrock.site;
 
 import com.brettonw.bedrock.bag.BagObject;
 import com.brettonw.bedrock.servlet.Tester;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.brettonw.bedrock.logger.*;
+
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;

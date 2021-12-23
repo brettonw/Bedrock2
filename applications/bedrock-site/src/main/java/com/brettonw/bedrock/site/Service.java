@@ -3,8 +3,7 @@ package com.brettonw.bedrock.site;
 import com.brettonw.bedrock.bag.BagObject;
 import com.brettonw.bedrock.service.Base;
 import com.brettonw.bedrock.service.Event;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.brettonw.bedrock.logger.*;
 
 import java.util.regex.Pattern;
 

@@ -7,8 +7,8 @@ import com.mongodb.client.*;
 import com.mongodb.client.model.*;
 import com.mongodb.*;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.brettonw.bedrock.logger.*;
+
 
 import org.bson.Document;
 import org.bson.conversions.Bson;

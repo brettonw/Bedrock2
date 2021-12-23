@@ -1,7 +1,7 @@
 package com.brettonw.bedrock.bag;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.brettonw.bedrock.logger.*;
+
 
 import sun.misc.Unsafe;
 

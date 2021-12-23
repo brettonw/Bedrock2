@@ -1,5 +1,5 @@
 module com.brettonw.bedrock.secret {
     requires com.brettonw.bedrock.bag;
-    requires org.apache.logging.log4j;
+    requires com.brettonw.bedrock.logger;
     exports com.brettonw.bedrock.secret;
 }

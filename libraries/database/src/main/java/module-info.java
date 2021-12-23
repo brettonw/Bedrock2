@@ -3,6 +3,6 @@ module com.brettonw.bedrock.database {
     requires org.mongodb.driver.sync.client;
     requires org.mongodb.driver.core;
     requires org.mongodb.bson;
-    requires org.apache.logging.log4j;
+    requires com.brettonw.bedrock.logger;
     exports com.brettonw.bedrock.database;
 }

@@ -3,8 +3,8 @@ package com.brettonw.bedrock.service;
 import com.brettonw.bedrock.bag.*;
 import com.brettonw.bedrock.bag.formats.MimeType;
 import org.apache.commons.io.input.ReversedLinesFileReader;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.brettonw.bedrock.logger.*;
+
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;

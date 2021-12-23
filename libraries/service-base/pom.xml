@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>com.brettonw.bedrock</groupId>
-            <artifactId>base</artifactId>
+            <artifactId>logger</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
