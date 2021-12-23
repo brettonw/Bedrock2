@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>/Users/brettonw/Work/Bedrock/Bedrock-2/applications/bedrock-site/src/main/dist/service-base.js - Bedrock</title>
+    <link rel="stylesheet" href="">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="stylesheet" href="../assets/css/custom.css">
+    <link rel="stylesheet" href="../assets/css/lucid.css">
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.css">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+</head>
+<body class="yui3-skin-sam">
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <h1 class="brand" style="padding: 10px 16px 10px; height: 20px; line-height: 20px; margin-left: 0;">
+            Bedrock
+        </h1>
+	<div class="nav">
+            <li class="divider-vertical"></li>
+            <li>
+                <p class="navbar-text">
+                    API Docs for Version: <b>2.1.0</b>
+                </p>
+            </li>
+        </div>
+        <form class="navbar-form pull-right" style="line-height: 40px; height: 40px;">
+            <input style="margin-top: 0;" type="text" class="search-query" placeholder="Search for classes/modules..." data-obj='[]'>
+        </form>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="span3">
+<div>
+    <div id="sidebar">
+    <div id="classes">
+        <ul id="api-classes" class="nav nav-list">
+        </ul>
+    </div>
+    </div>
+</div>
+        </div>
+        <div class="span9">
+    <form id="options-form" class="form-inline pull-right">
+        Show:
+        <label for="api-show-inherited" class="checkbox">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected" class="checkbox">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private" class="checkbox">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated" class="checkbox">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </form>
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<div class="page-header">
+    <h1>/Users/brettonw/Work/Bedrock/Bedrock-2/applications/bedrock-site/src/main/dist/service-base.js <small>File</small></h1>
+</div>
+
+<div class="file">
+    <pre class="prettyprint linenums">
+Bedrock.ServiceBase = function () {
+    let $ = Object.create (null);
+
+    const API = &quot;api&quot;;
+
+    /**
+     * build a query url. note bedrock no longer accepts any parameters on the query line, so this
+     * is either a valid url, or it&#x27;s going to be replaced with the local server url
+     * @param parameters
+     * @returns {string|{}}
+     */
+    $.getQueryUrl = function (queryUrl) {
+        return ((typeof queryUrl === &quot;string&quot;) &amp;&amp; (queryUrl.length &gt; 0)) ? queryUrl : (Bedrock.Cookie.get(&quot;full-context-path&quot;) + API);
+    };
+
+    /**
+     * post an event to a bedrock service, and get back the full response context
+     * @param event
+     * @param parameters - optional
+     * @param onSuccess - optional
+     * @param onFailure - optional
+     * @param queryUrl - optional
+     */
+    $.postWithFullResponse = function (event, parameters, onSuccess, onFailure, queryUrl) {
+        queryUrl = $.getQueryUrl(queryUrl);
+
+        // build the event description, we force the event name to be specified to avoid the super
+        // common case of the caller building an object with just an event, and we copy other
+        // parameters in to the object that we will subsequently turn into a JSON string
+        let postData = {};
+        if ((typeof parameters === &quot;object&quot;) &amp;&amp; (parameters !== null)) {
+            Object.assign(postData, parameters);
+        }
+        postData.event = event;
+        postData = JSON.stringify(postData);
+
+        // a fail function
+        let fail = function (errorResponse) {
+            if (onFailure instanceof Function) {
+                onFailure ((typeof errorResponse === &quot;string&quot;) ? { error: errorResponse } : errorResponse);
+            }
+        };
+
+        // post the query to the server...
+        let request = new XMLHttpRequest ();
+        request.onload = function (progressEvent) {
+            // http status 200 is &quot;OK&quot;, the request has succeeded and completed
+            if (request.status === 200) {
+                let response = JSON.parse (this.responseText);
+                LOG (INFO, query + &quot; (status: &quot; + response.status + &quot;)&quot;);
+                if ((!(&quot;status&quot; in response)) || (response.status === &quot;ok&quot;)) {
+                    if (onSuccess instanceof Function) {
+                        onSuccess(response);
+                    }
+                } else {
+                    fail (response);
+                }
+            }
+        };
+
+        // don&#x27;t take more than a few seconds
+        request.timeout = 3000;
+        request.ontimeout = function (progressEvent) { fail (&quot;request took more than &quot; + request.timeout + &quot; ms&quot;); };
+        request.onerror = function () { fail (&quot;request could not be completed&quot; ); };
+        request.onabort = function () { fail (&quot;request aborted&quot;); };
+
+        // POST should always bypass the cache
+        request.open (&quot;POST&quot;, queryUrl + &quot;?&quot; + Date.now(), true);
+
+        // send the JSON formatted data
+        request.setRequestHeader(&quot;Content-Type&quot;, &quot;application/json&quot;);
+        request.send (postData);
+    };
+
+    /**
+     * post an event to a bedrock service, and get just the response
+     * @param event
+     * @param parameters - optional
+     * @param onSuccess - optional
+     * @param onFailure - optional
+     * @param queryUrl - optional
+     */
+    $.post = function (event, parameters, onSuccess, onFailure, queryUrl) {
+        $.postWithFullResponse(event, parameters,
+            function (response) {
+                if (onSuccess instanceof Function) {
+                    onSuccess((&quot;response&quot; in response) ? response.response : response.status);
+                }
+            },
+            function (response) {
+                if (onFailure instanceof Function) {
+                    onFailure(response.error);
+                }
+            },
+            queryUrl);
+    };
+
+    return $;
+} ();
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/jquery/jquery-1.8.2.min.js"></script>
+<script src="../assets/vendor/bootstrap/js/bootstrap.js"></script>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script src="../assets/js/yuidoc-bootstrap.js"></script>
+<script>prettyPrint();</script>
+</body>
+</html>
