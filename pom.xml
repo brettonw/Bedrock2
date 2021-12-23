@@ -59,6 +59,7 @@
                 <version>3.8.1</version>
                 <configuration>
                     <source>${java.version}</source>
+                    <release>${java.version}</release>
                     <target>${java.version}</target>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
