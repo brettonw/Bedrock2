@@ -82,6 +82,7 @@ echo "Generate Docs - Created doc artifact dirs at $DOCS_ARTIFACT_VERSION_DIR";
 
 # make the docs (implicitly uses yuidoc.json)
 echo "Generate Docs - Make docs";
+if [ 0 ]; then
 yuidoc --config bin/yuidoc.json --project-version "$PROJECT_VERSION" --quiet --outdir "$DOCS_ARTIFACT_VERSION_DIR/$PROJECT_NAME" "$SRC_DIR";
 
 # copy docs from dependent projects (maven aggregation goals don't seem to work for this)
@@ -94,6 +95,7 @@ for LIBRARY_NAME in *; do
     fi
 done
 popd;
+fi
 
 echo "Generate Docs - Done";
 
