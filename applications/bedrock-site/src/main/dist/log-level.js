@@ -10,7 +10,7 @@ Bedrock.LogLevel = function () {
 
     let formatStrings = ["TRC", "INF", "WRN", "ERR"];
     _.say = function (messageLogLevel, message) {
-        if (messageLogLevel >= logLevel) {
+        if (messageLogLevel.value >= logLevel.value) {
             console.log (formatStrings[messageLogLevel.value] + ": " + message)
         }
     };
